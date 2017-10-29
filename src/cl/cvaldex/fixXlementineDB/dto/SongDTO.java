@@ -10,6 +10,24 @@ public class SongDTO {
 	String title;
 	boolean update;
 	
+	public String toString(){
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append(artist);
+		builder.append(" - ");
+		builder.append(album);
+		builder.append(" - ");
+		builder.append(title);
+		builder.append(" - ");
+		builder.append(fileName);
+		builder.append(" - ");
+		builder.append(bitrate);
+		builder.append(" - ");
+		builder.append(length);
+		
+		return builder.toString();
+	}
+	
 	public String getFileName() {
 		return fileName;
 	}
