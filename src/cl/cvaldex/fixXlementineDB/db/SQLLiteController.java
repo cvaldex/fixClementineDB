@@ -31,7 +31,7 @@ public class SQLLiteController {
 			connection = getConnection(dbFileName);
 
 			Collection<SongDTO> wrongAlbums = getWrongAlbums(dbFileName);
-			String selectQuery = "SELECT artist , album , title , filename FROM songs WHERE artist = ? AND album = ?;";
+			String selectQuery = "SELECT rowid , artist , album , title , filename FROM songs WHERE artist = ? AND album = ? AND unavailable = 0;";
 			
 			
 			for(SongDTO wrongAlbumSampleSong : wrongAlbums){
@@ -45,6 +45,7 @@ public class SQLLiteController {
 
 				while ( rs.next() ) {
 					song = new SongDTO();
+					song.setRowid(rs.getInt("rowid"));
 					song.setArtist(rs.getString("artist"));
 					song.setAlbum(rs.getString("album"));
 					song.setTitle(rs.getString("title"));
@@ -76,7 +77,9 @@ public class SQLLiteController {
 			connection = getConnection(dbFileName);
 
 			stmt = connection.createStatement();
-			ResultSet rs = stmt.executeQuery( "SELECT DISTINCT artist, album FROM songs WHERE length < 0;" );
+			//cuando el length < 0 no fue bien procesado
+			//unavailable = 1 significa que el archivo se encuentra aun en la colección
+			ResultSet rs = stmt.executeQuery( "SELECT DISTINCT artist, album, title FROM songs WHERE length < 0 AND unavailable = 0;" );
 			
 			SongDTO song = null;
 			
@@ -107,8 +110,8 @@ public class SQLLiteController {
 		
 		try {
 			connection = getConnection(dbFileName);
-
-			String updateQuery = "UPDATE songs SET length = ? , bitrate = ? , samplerate = ? WHERE artist = ? AND album = ? and title = ?;";
+			
+			String updateQuery = "UPDATE songs SET length = ? , bitrate = ? , samplerate = ? WHERE rowid = ?;";
 			
 			for(SongDTO song : rowsToFix){
 				if(song.isUpdate()){
@@ -116,14 +119,12 @@ public class SQLLiteController {
 					preparedStatement.setLong(1, song.getLength());
 					preparedStatement.setInt(2, song.getBitrate());
 					preparedStatement.setInt(3, song.getSampleRate());
-					preparedStatement.setString(4 , song.getArtist());
-					preparedStatement.setString(5 , song.getAlbum());
-					preparedStatement.setString(6 , song.getTitle());
-
+					preparedStatement.setInt(4 , song.getRowid());
+					
 					preparedStatement.executeUpdate();
 					rowsFixed++;
 					
-					System.out.println(song.toString());
+					System.out.println(rowsFixed + " - " + song.toString());
 				}
 			}
 

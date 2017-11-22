@@ -9,6 +9,7 @@ public class SongDTO {
 	String album;
 	String title;
 	boolean update;
+	int rowid;
 	
 	public String toString(){
 		StringBuilder builder = new StringBuilder();
@@ -75,5 +76,13 @@ public class SongDTO {
 	}
 	public void setUpdate(boolean update) {
 		this.update = update;
+	}
+
+	public int getRowid() {
+		return rowid;
+	}
+
+	public void setRowid(int rowid) {
+		this.rowid = rowid;
 	}
 }
