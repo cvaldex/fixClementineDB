@@ -11,7 +11,7 @@ import java.util.Collection;
 
 import cl.cvaldex.fixXlementineDB.dto.SongDTO;
 
-public class SQLLiteController {
+public class SQLLiteDAO {
 	
 	private static Connection getConnection(String dbFileName) throws ClassNotFoundException, SQLException{
 		Class.forName("org.sqlite.JDBC");
