@@ -17,7 +17,6 @@ public class SQLLiteDAO {
 		Class.forName("org.sqlite.JDBC");
 		Connection connection = DriverManager.getConnection("jdbc:sqlite:"+dbFileName);
 		connection.setAutoCommit(false);
-		System.out.println("Opened database successfully");
 		
 		return connection;
 	}

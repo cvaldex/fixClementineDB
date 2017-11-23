@@ -8,26 +8,27 @@ import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
 
 import cl.cvaldex.fixXlementineDB.backup.DBBackup;
-import cl.cvaldex.fixXlementineDB.db.SQLLiteController;
+import cl.cvaldex.fixXlementineDB.db.SQLLiteDAO;
 import cl.cvaldex.fixXlementineDB.dto.SongDTO;
 
 /**
  *
  * @author cvaldesc
- *
+ * TODO Translate messages
+ * TODO Add Logger
+ * TODO Receive DB File Path by arguments
  */
 
 public class FixClementineDBMain {
 	public static void main(String[] args) throws UnsupportedTagException, InvalidDataException, IOException{
 		String dbFileName = "/Users/cvaldesc/Library/Application Support/Clementine/clementine.db";
-		
-		DBBackup.backupFile(dbFileName);
 
 		System.out.println("Obteniendo registros a actualizar");
 
-		Collection<SongDTO> songsToFix = SQLLiteController.getWrongSongs(dbFileName);
+		Collection<SongDTO> songsToFix = SQLLiteDAO.getWrongSongs(dbFileName);
 		int archivosNoEncontrados = 0;
 		int archivosErroneos = 0;
+		int songsToUpdate = 0;
 
 		System.out.println("Recopilando información desde archivos");
 
@@ -40,6 +41,8 @@ public class FixClementineDBMain {
 				song.setBitrate(mp3file.getBitrate());
 				song.setLength(mp3file.getLengthInSeconds() * 1000000000);
 				song.setSampleRate(mp3file.getSampleRate());
+				
+				songsToUpdate++;
 			}
 			catch(java.io.FileNotFoundException fnfe){
 				System.out.println("Archivo no encontrado: " + getFixedFileName(song.getFileName()));
@@ -57,10 +60,14 @@ public class FixClementineDBMain {
 
 		System.out.println("Archivos no entrados: " + archivosNoEncontrados);
 		System.out.println("Archivos erroneos: " + archivosErroneos);
-
-		System.out.println("Actualizando canciones");
-
-		SQLLiteController.updateSongs(dbFileName, songsToFix);
+		System.out.println("Canciones a actualizar: " + songsToUpdate);
+		
+		if(songsToUpdate > 0){
+			DBBackup.backupFile(dbFileName);
+			
+			System.out.println("Actualizando canciones");
+			SQLLiteDAO.updateSongs(dbFileName, songsToFix);
+		}
 
 		System.out.println("Fin del proceso");
 	}
